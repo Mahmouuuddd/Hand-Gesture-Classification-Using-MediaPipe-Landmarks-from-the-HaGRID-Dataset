@@ -120,18 +120,18 @@ python test.py
 
 The following models were evaluated and compared during development:
 
-| Model | Notes |
+| Model | Accuracy |
 |---|---|
-| Support Vector Machine (SVM) | Baseline |
-| Logistic Regression | Baseline |
-| Random Forest | Ensemble method |
-| K-Nearest Neighbors (KNN) | Distance-based |
-| AdaBoost | Boosting method |
-| **XGBoost** | ✅ **Selected — best overall performance** |
+| **XGBoost** | **98.28%** ✅ |
+| Random Forest | 97.62% |
+| KNN | 96.70% |
+| SVM | 93.98% |
+| Logistic Regression | 91.13% |
+| AdaBoost | 60.44% |
 
 **XGBoost** achieved the best performance across all evaluation metrics and was selected as the final model.
 
-The trained model is saved as `model.pkl` and loaded at inference time by `test.py`.
+The trained model is saved as `xgb_hand_gesture_model.pkl` and loaded at inference time by `test.py`.
 
 > 📊 Full experiment comparisons across all 6 models are available in the [`research`](../../tree/research) branch via the MLflow dashboard.
 
@@ -141,7 +141,7 @@ The trained model is saved as `model.pkl` and loaded at inference time by `test.
 
 > 🔬 This section applies to the [`research`](../../tree/research) branch.
 
-All training runs are tracked using **MLflow**, allowing full comparison of every model across all metrics in a visual dashboard.
+All training runs are tracked using **MLflow**, allowing full comparison of every model across all metrics in a visual dashboard. Screenshots of the MLflow UI are available in the [`MLflow Screenshots`](./MLflow%20Screenshots) folder.
 
 ### Switch to the research branch
 
@@ -163,22 +163,27 @@ Then open your browser at:
 http://127.0.0.1:5000
 ```
 
-You will see a dashboard comparing all runs side by side:
-
-| Run | Model | Accuracy | F1 Score | Precision | Recall |
-|---|---|---|---|---|---|
-| 1 | XGBoost | ✅ best | ✅ best | ✅ best | ✅ best |
-| 2 | Random Forest | — | — | — | — |
-| 3 | AdaBoost | — | — | — | — |
-| 4 | SVM | — | — | — | — |
-| 5 | Logistic Regression | — | — | — | — |
-| 6 | KNN | — | — | — | — |
-
 ### What is logged per run
 
 - **Parameters** — model name and hyperparameters
 - **Metrics** — accuracy, F1 score, precision, recall
 - **Artifact** — the trained model saved and versioned by MLflow
+
+### Registered Model
+
+The best model is registered in the MLflow Model Registry as:
+
+```
+XGBoost-Hand-Gesture — Version 1 (alias: production)
+```
+
+Load it in code using:
+
+```python
+import mlflow.sklearn
+
+model = mlflow.sklearn.load_model("models:/XGBoost-Hand-Gesture@production")
+```
 
 ---
 
@@ -199,20 +204,26 @@ Full evaluation details and per-class breakdowns are available in `Hand_project.
 
 **`main` branch:**
 ```
-├── test.py                # Real-time webcam inference script
-├── model.pkl              # Trained XGBoost model
-├── requirements.txt       # Python dependencies
-├── Hand_project.ipynb     # Training, evaluation, and analysis notebook
+├── test.py                      # Real-time webcam inference script
+├── xgb_hand_gesture_model.pkl   # Trained XGBoost model
+├── label_encoder.pkl            # Label encoder for gesture classes
+├── requirements.txt             # Python dependencies
+├── Hand_project.ipynb           # Training, evaluation, and analysis notebook
+├── data/                        # Dataset directory
 └── README.md
 ```
 
 **`research` branch:**
 ```
-├── test.py                # Real-time webcam inference script
-├── model.pkl              # Trained XGBoost model
-├── requirements.txt       # Python dependencies (includes mlflow)
-├── Hand_project.ipynb     # Training, evaluation, and MLflow tracking notebook
-├── mlruns/                # MLflow experiment logs (auto-generated, not committed)
+├── test.py                      # Real-time webcam inference script
+├── xgb_hand_gesture_model.pkl   # Trained XGBoost model
+├── label_encoder.pkl            # Label encoder for gesture classes
+├── requirements.txt             # Python dependencies (includes mlflow)
+├── Hand_project.ipynb           # Training, evaluation, and MLflow tracking notebook
+├── data/                        # Dataset directory
+├── mlruns/                      # MLflow experiment logs and registered models
+│   └── 1/models/                # Saved model artifacts
+├── MLflow Screenshots/          # Screenshots from the MLflow UI
 └── README.md
 ```
 
